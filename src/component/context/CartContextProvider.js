@@ -1,6 +1,7 @@
 import { useReducer } from "react";
 import { FINAL_DATA_LIST } from "../Util/Constants";
 import CartContext from "./CartContext";
+
 const defaultCartState = {
   finalItemList: [],
   itemList: [],
@@ -10,18 +11,30 @@ const defaultCartState = {
 const cartReducer = (state, action) => {
   //Add Item: updating reducer State:
   if (action.type === "ADD_ITEM") {
+    console.log(state);
+    console.log(action);
     //Add Item: updating total Price
     const updateTotalAmount =
       state.totalAmount + action.item.price * action.item.amount;
 
     //Add Item: updatomg CartList
     const updatedCartItemIndex = state.itemList.findIndex(
-      (item) => item.id === action.item.id
+      (item) => item.catigory === action.item.catigory
     );
-    const existingCartItem = state.itemList[updatedCartItemIndex];
+    const existingCartCatigoryItem = state.itemList[updatedCartItemIndex];
     let updatedItemList;
-
-    if (existingCartItem) {
+    if (existingCartCatigoryItem) {
+      const catigotyItemList = existingCartCatigoryItem.catigoryItemList
+      const existingCartIndex = catigotyItemList.findIndex(item => item.itemId === action.item.itemId)
+      const existingCartItem =catigotyItemList[existingCartIndex]
+      if(existingCartItem){
+        const updatedCartItem = {
+          ...existingCartItem,
+          amount: existingCartItem.amount + action.item.amount,
+        };
+        updatedItemList = [...state.itemList];
+        updatedItemList[updatedCartItemIndex] = updatedCartItem;
+      }
       const updatedCartItem = {
         ...existingCartItem,
         amount: existingCartItem.amount + action.item.amount,
@@ -29,9 +42,15 @@ const cartReducer = (state, action) => {
       updatedItemList = [...state.itemList];
       updatedItemList[updatedCartItemIndex] = updatedCartItem;
     } else {
-      updatedItemList = state.itemList.concat(action.item);
+      const updatedCartItem = {
+        itemList: {
+          catigory: action.item.catigory,
+          catigoryItemList: [action.item],
+        },
+      };
+      updatedItemList = state.itemList.concat(updatedCartItem);
     }
-    return { itemList: updatedItemList, totalAmount: updateTotalAmount };
+    return { ...state, itemList: updatedItemList, totalAmount: updateTotalAmount };
   }
   //Remove Item: updating reducer State:
   if (action.type === "REMOVE_ITEM") {
@@ -51,7 +70,11 @@ const cartReducer = (state, action) => {
       updateItemList = [...state.itemList];
       updateItemList[updatedCartItemIndex] = updateItem;
     }
-    return { itemList: updateItemList, totalAmount: updatedTotalAmount };
+    return {
+      ...state,
+      itemList: updateItemList,
+      totalAmount: updatedTotalAmount,
+    };
   }
 
   //Final List: updating reducer State:
@@ -68,6 +91,7 @@ const CartContextProvider = (props) => {
     cartReducer,
     defaultCartState
   );
+  console.log(cartState);
   if (cartState.finalItemList.length === 0) {
     dispatchCartState(
       { type: "UPDATE_FINAL_LIST", finalItemList: FINAL_DATA_LIST },
@@ -76,9 +100,9 @@ const CartContextProvider = (props) => {
   }
 
   const addItemToContext = (item) => {
-    console.log(item);
     dispatchCartState({ type: "ADD_ITEM", item: item });
   };
+
   const removeItemFormContext = (id) => {
     dispatchCartState({ type: "REMOVE_ITEM", id: id });
   };

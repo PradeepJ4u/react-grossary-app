@@ -17,8 +17,6 @@ function GrossaryItemForm(props) {
       setAmountIsValid(false)
       return;
     }
-    console.log(enteredAmount);
-    console.log(typeof enteredAmount);
     props.onAddToCart(+enteredAmount)
   };
   return (

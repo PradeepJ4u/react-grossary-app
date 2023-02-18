@@ -1,25 +1,25 @@
+import { useContext } from "react";
+import CartContext from "../../context/CartContext";
 import GrossaryItemForm from "./GrossaryItemForm";
 import styles from "./GrossaryTabItemData.module.css";
 
 function GrossaryTabItemData(props) {
-  // const cntx = useContext(CartContext);
+  const cntx = useContext(CartContext);
+  const grossaryItem = props.item
+
   const addToCartHandler = (enteredAmount) => {
-    // cntx.addItem({
-    //   id: currentTabDataList.id,
-    //   name: mealItem.name,
-    //   price: mealItem.price,
-    //   amount: enteredAmount,
-    // });
-    // console.log({
-    //   id: mealItem.id,
-    //   name: mealItem.name,
-    //   price: mealItem.price,
-    //   amount: enteredAmount,
-    // });
+    cntx.addItem({
+      itemId: grossaryItem.itemId,
+      itemName: grossaryItem.itemName,
+      catigory: grossaryItem.catigory,
+      quantity: grossaryItem.defaultQuantity + ' ' + grossaryItem.defaultUnitQuantity,
+      price: grossaryItem.price,
+      amount: enteredAmount,
+    });
   };
 
   return (
-    <li className={styles["available-list-item"]} key={props.item.itemId}>
+    <li key={props.item.id} className={styles["available-list-item"]}>
       <h3>{props.item.itemName}</h3>
       <div className={styles.description}>
         {props.item.defaultQuantity} {props.item.defaultUnitQuantity}

@@ -1,15 +1,14 @@
 import Modal from "../UI/Modal";
 import styles from "./Cart.module.css";
-import CartItem from "./CartItem";
-import { FINAL_DATA_LIST } from '../Util/Constants'
+import { useContext } from "react";
+import CartContext from "../context/CartContext";
 
 function Cart(props) {
-  // const cntx = useContext(CartContext);
-  // console.log(cntx);
+  const cntx = useContext(CartContext);
+  console.log(cntx);
 
-  const totalAmount = 39.62;
-  // const showOrderButton = cntx.itemList.length > 0;
-  const showOrderButton = false
+  const totalAmount = cntx.totalAmount;
+  const showOrderButton = cntx.itemList.length > 0;
 
   const addItemToCart = (item) => {
     // cntx.addItem({...item, amount:+1})
@@ -19,16 +18,11 @@ function Cart(props) {
   };
   const cartItem = (
     <ul className={styles["cart-items"]}>
-      {FINAL_DATA_LIST.map((item) => {
+      {cntx.itemList.map((catigoryItem) => {
         return (
-          <CartItem
-            key={item.itemId}
-            name={item.itemName}
-            price={item.price}
-            amount={item.defaultQuantity}
-            onAddItem={addItemToCart.bind(null, item)}
-            onRemoveItem={removeItemToCart.bind(null, item.itemId)}
-          />
+          <div key={catigoryItem}>
+            <h1>{catigoryItem.catigory}</h1>
+          </div>
         );
       })}
     </ul>

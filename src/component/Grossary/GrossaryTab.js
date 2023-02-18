@@ -25,7 +25,6 @@ export default function GrossaryTab() {
   let currentTabValues = null;
 
   const handleChange = (event: React.SyntheticEvent, number) => {
-    console.log(number);
     currentTabValues = { value: number, label: uniqueCatigories[number] };
     setCurrentTab(currentTabValues);
   };
@@ -40,19 +39,19 @@ export default function GrossaryTab() {
             value={+currentTab.value}
             onChange={handleChange}
             variant="scrollable"
-            // scrollButtons="auto"
             orientation="horizontal"
             aria-label="scrollable auto tabs example"
           >
             {uniqueCatigories.map((catigory) => {
               const catigoryDescription = capitalizeWords(catigory);
               return (
-                <Tab key={catigoryDescription} label={catigoryDescription} />
+                <Tab key={catigory} label={catigoryDescription} />
               );
             })}
           </Tabs>
         </Box>
         <GrossaryTabItemList
+          key={currentTab.value}
           value={currentTab.value}
           index={currentTab.value}
           selectedcatigory={

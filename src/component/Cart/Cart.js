@@ -5,9 +5,9 @@ import CartContext from "../context/CartContext";
 
 function Cart(props) {
   const cntx = useContext(CartContext);
-  console.log(cntx);
+  //itemList [{itemId: 1, itemName: 'Mong Daal', quantity: '500 grms', price: 100, amount: 2}]
 
-  const totalAmount = cntx.totalAmount;
+  const totalAmount = cntx.totalAmount.toFixed(2);
   const showOrderButton = cntx.itemList.length > 0;
 
   const addItemToCart = (item) => {
@@ -20,7 +20,8 @@ function Cart(props) {
     <ul className={styles["cart-items"]}>
       {cntx.itemList.map((catigoryItem) => {
         return (
-          <div key={catigoryItem}>
+          <div key={catigoryItem.catigory}>
+            {console.log(catigoryItem.catigory)}
             <h1>{catigoryItem.catigory}</h1>
           </div>
         );
@@ -32,7 +33,7 @@ function Cart(props) {
       {cartItem}
       <div className={styles.total}>
         <span>Total Amount</span>
-        <span>{totalAmount}</span>
+        <span>Rs. {totalAmount}</span>
       </div>
       <div className={styles.actions}>
         <button className={styles["button--alt"]} onClick={props.hideCart}>

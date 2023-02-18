@@ -5,16 +5,19 @@ import styles from "./GrossaryTabItemData.module.css";
 
 function GrossaryTabItemData(props) {
   const cntx = useContext(CartContext);
-  const grossaryItem = props.item
+  const grossaryItem = props.item;
 
   const addToCartHandler = (enteredAmount) => {
     cntx.addItem({
-      itemId: grossaryItem.itemId,
-      itemName: grossaryItem.itemName,
-      catigory: grossaryItem.catigory,
-      quantity: grossaryItem.defaultQuantity + ' ' + grossaryItem.defaultUnitQuantity,
-      price: grossaryItem.price,
-      amount: enteredAmount,
+      catigory: props.itemCatigory,
+      catigoryItemData: {
+        itemId: grossaryItem.itemId,
+        itemName: grossaryItem.itemName,
+        quantity:
+          grossaryItem.defaultQuantity + " " + grossaryItem.defaultUnitQuantity,
+        price: grossaryItem.price,
+        amount: enteredAmount,
+      },
     });
   };
 

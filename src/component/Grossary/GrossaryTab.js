@@ -5,7 +5,6 @@ import Card from "../UI/Card";
 
 import styles from "./GrossaryTab.module.css";
 import { Tab } from "@mui/material";
-import { capitalizeWords } from "../Util/UtilityMethod";
 import GrossaryTabItemList from "./GrossaryTabItemList";
 import CartContext from "../context/CartContext";
 
@@ -14,18 +13,12 @@ export default function GrossaryTab() {
 
   const cntx = React.useContext(CartContext);
 
-  let uniqueCatigories = [];
-
   const finalListItems = cntx.finalItemList;
-
-  uniqueCatigories = Array.from(
-    new Set(finalListItems.map((item) => item.catigory))
-  );
 
   let currentTabValues = null;
 
   const handleChange = (event: React.SyntheticEvent, number) => {
-    currentTabValues = { value: number, label: uniqueCatigories[number] };
+    currentTabValues = { value: number, label: finalListItems[number] };
     setCurrentTab(currentTabValues);
   };
 
@@ -38,26 +31,24 @@ export default function GrossaryTab() {
           <Tabs
             value={+currentTab.value}
             onChange={handleChange}
-            variant="scrollable"
+            // variant="scrollable"
             orientation="horizontal"
             aria-label="scrollable auto tabs example"
           >
-            {uniqueCatigories.map((catigory) => {
-              const catigoryDescription = capitalizeWords(catigory);
+            {finalListItems.map((catigoryList) => {              
               return (
-                <Tab key={catigory} label={catigoryDescription} />
+                <Tab key={catigoryList.catigory} label={catigoryList.catigory} />
               );
             })}
           </Tabs>
         </Box>
         <GrossaryTabItemList
-          key={currentTab.value}
-          value={currentTab.value}
-          index={currentTab.value}
-          selectedcatigory={
-            uniqueCatigories[currentTab.value] == null
-              ? uniqueCatigories[0]
-              : uniqueCatigories[currentTab.value]
+          value={currentTab.value=== "" ? 0 : currentTab.value}
+          index={currentTab.value=== "" ? 0 : currentTab.value}
+          selectedcatigorydata={
+            finalListItems[currentTab.value] == null
+              ? finalListItems[0]
+              : finalListItems[currentTab.value]
           }
         />
       </Card>

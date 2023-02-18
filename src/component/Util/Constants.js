@@ -35,26 +35,29 @@ const Users = [
           },
         ],
       },
-      {catigory: "Snacks",
-      catigoryItemList: [
       {
-        itemId: 103,
-        itemName: "Mong Daal",
-        img: "",
-        isBaseItem: true,
-        defaultQuantity: 500,
-        defaultUnitQuantity: "grms",
-        price: 90.0,
+        catigory: "Grains",
+        catigoryItemList: [
+          {
+            itemId: 103,
+            itemName: "Mong Daal",
+            img: "",
+            isBaseItem: true,
+            defaultQuantity: 500,
+            defaultUnitQuantity: "grms",
+            price: 90.0,
+          },
+          {
+            itemId: 104,
+            itemName: "Mix Daal",
+            img: "",
+            isBaseItem: true,
+            defaultQuantity: 500,
+            defaultUnitQuantity: "grms",
+            price: 100,
+          },
+        ],
       },
-      {
-        itemId: 104,
-        itemName: "Mix Daal",
-        img: "",
-        isBaseItem: true,
-        defaultQuantity: 500,
-        defaultUnitQuantity: "grms",
-        price: 100,
-      }
     ],
   },
 ];
@@ -109,7 +112,7 @@ const BaseItemList = [
         defaultUnitQuantity: "grms",
         price: 100,
       },
-     
+
       {
         itemId: 11,
         itemName: "Safed Chola",
@@ -160,15 +163,26 @@ const BaseItemList = [
     ],
   },
 ];
+export const FINAL_DATA_LIST = [];
 export const CNTX_USER = Users[0];
-for (let i=0; i < BaseItemList.length ; i++){
-  for (let j=0; j < CNTX_USER.customItems.length ; j++){
-    console.log(BaseItemList[i].catigory);
-    console.log(CNTX_USER.customItems[j].catigory)
-    if (BaseItemList[i].catigory.toUpperCase() === CNTX_USER.customItems[j].catigory.toUpperCase()){
-      BaseItemList[i].catigoryItemList = BaseItemList[i].catigoryItemList.concat(CNTX_USER.customItems.catigoryItem)}
+for (let i = 0; i < BaseItemList.length; i++) {
+  FINAL_DATA_LIST.push(BaseItemList[i]);
+}
+
+for (let i = 0; i < CNTX_USER.customItems.length; i++) {
+  const existingFinalListItemIndex = FINAL_DATA_LIST.findIndex(
+    (item) => item.catigory === CNTX_USER.customItems[i].catigory
+  );
+  const existingfinalListItem = FINAL_DATA_LIST[existingFinalListItemIndex];
+  if (existingfinalListItem) {
+    const mergedList = {
+      catigory: CNTX_USER.customItems[i].catigory,
+      catigoryItemList: existingfinalListItem.catigoryItemList.concat(
+        CNTX_USER.customItems[i].catigoryItemList
+      ),
+    };
+    FINAL_DATA_LIST[existingFinalListItemIndex] = mergedList;
+  } else {
+    FINAL_DATA_LIST.push(CNTX_USER.customItems[i]);
   }
 }
-console.log(BaseItemList);
-
-export const FINAL_DATA_LIST = BaseItemList.concat(CNTX_USER.customItems);

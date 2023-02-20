@@ -16,27 +16,48 @@ const cartReducer = (state, action) => {
       state.totalAmount +
       action.item.catigoryItemData.price * action.item.catigoryItemData.amount;
 
-    //Add Item: updatimg CartList
-    console.log(state);
-    console.log(action);
+    //Add Item: updating CartList
 
     const existingCatigoryIndex = state.itemList.findIndex(
       (catigoryItem) => catigoryItem.catigory === action.item.catigory
     );
     const existingCatigoryItem = state.itemList[existingCatigoryIndex];
-
     let updatedItemList = [];
     if (existingCatigoryItem) {
-      const existingItemIndex = state.itemList.findIndex(
-        (catigoryItem) => catigoryItem.catigory === action.item.catigory
+      //catiogory found
+      const existingItemIndex = existingCatigoryItem.catigoryItemList.findIndex(
+        (catigoryItem) =>
+          catigoryItem.itemId === action.item.catigoryItemData.itemId
       );
-      const existingCatigoryItem = state.itemList[existingCatigoryIndex];
+      const existingItemData =
+        existingCatigoryItem.catigoryItemList[existingItemIndex];
+      if (existingItemData) {
+        //existing item found
+        const updatedItemData = {
+          ...existingItemData,
+          amount: existingItemData.amount + action.item.catigoryItemData.amount,
+        };
+        existingCatigoryItem.catigoryItemList[existingItemIndex] =
+          updatedItemData;
+
+        updatedItemList = state.itemList;
+      } else {
+        //existing item not found
+        const currentItemList = existingCatigoryItem.catigoryItemList;
+        const finalStateItemList = {
+          catigory: action.item.catigory,
+          catigoryItemList: [...currentItemList, action.item.catigoryItemData],
+        };
+        state.itemList[existingCatigoryIndex] = finalStateItemList
+        updatedItemList = state.itemList
+      }
     } else {
+      //catigory not found
       const finalStateItemList = {
         catigory: action.item.catigory,
         catigoryItemList: [action.item.catigoryItemData],
       };
-      updatedItemList = [finalStateItemList];
+      updatedItemList = [...state.itemList, finalStateItemList];
     }
     return {
       ...state,
@@ -46,25 +67,85 @@ const cartReducer = (state, action) => {
   }
   //Remove Item: updating reducer State:
   if (action.type === "REMOVE_ITEM") {
-    const updatedCartItemIndex = state.itemList.findIndex(
-      (item) => item.id === action.id
-    );
-    const existingCartItem = state.itemList[updatedCartItemIndex];
-    const updatedTotalAmount = state.totalAmount - existingCartItem.price;
-    let updateItemList;
-    if (existingCartItem.amount === 1) {
-      updateItemList = state.itemList.filter((item) => item.id !== action.id);
-    } else {
-      const updateItem = {
-        ...existingCartItem,
-        amount: existingCartItem.amount - 1,
-      };
-      updateItemList = [...state.itemList];
-      updateItemList[updatedCartItemIndex] = updateItem;
+    let updatedItemList = [];
+    let currentItemPrice = 0;
+
+    const existingList = state.itemList;
+    for (let i = 0; i < existingList.length; i++) {
+      for (let j = 0; j < existingList[i].catigoryItemList.length; j++) {
+        let updatedCartigoryItem = null;
+        if (existingList[i].catigoryItemList[j].itemId === action.itemId) {
+          currentItemPrice = existingList[i].catigoryItemList[j].price;
+          if (existingList[i].catigoryItemList[j].amount > 1) {
+            updatedCartigoryItem = {
+              catigory: existingList[i].catigory,
+              catigoryItemList: [
+                {
+                  itemId: existingList[i].catigoryItemList[j].itemId,
+                  itemName: existingList[i].catigoryItemList[j].itemName,
+                  quantity: existingList[i].catigoryItemList[j].quantity,
+                  amount: existingList[i].catigoryItemList[j].amount - 1,
+                  price: existingList[i].catigoryItemList[j].price,
+                },
+              ],
+            };
+            const existingCatigoryIndex = updatedItemList.findIndex(
+              (listItem) => listItem.catigory === updatedCartigoryItem.catigory
+            );
+            const exisitngCatigoryItem = updatedItemList[existingCatigoryIndex];
+            let updatedItem = null;
+            if (exisitngCatigoryItem) {
+              updatedItem = {
+                catigory: exisitngCatigoryItem.catigory,
+                catigoryItemList: exisitngCatigoryItem.catigoryItemList.concat(
+                  updatedCartigoryItem.catigoryItemList
+                ),
+              };
+              updatedItemList[existingCatigoryIndex] = updatedItem
+            } else {
+              updatedItem = updatedCartigoryItem;
+              updatedItemList.push(updatedItem);
+            }
+           
+          }
+        } else {
+          updatedCartigoryItem = {
+            catigory: existingList[i].catigory,
+            catigoryItemList: [
+              {
+                itemId: existingList[i].catigoryItemList[j].itemId,
+                itemName: existingList[i].catigoryItemList[j].itemName,
+                quantity: existingList[i].catigoryItemList[j].quantity,
+                amount: existingList[i].catigoryItemList[j].amount,
+                price: existingList[i].catigoryItemList[j].price,
+              },
+            ],
+          };
+          const existingCatigoryIndex = updatedItemList.findIndex(
+            (listItem) => listItem.catigory === updatedCartigoryItem.catigory
+          );
+          const exisitngCatigoryItem = updatedItemList[existingCatigoryIndex];
+
+          let updatedItem = null;
+          if (exisitngCatigoryItem) {
+            updatedItem = {
+              catigory: exisitngCatigoryItem.catigory,
+              catigoryItemList: exisitngCatigoryItem.catigoryItemList.concat(
+                updatedCartigoryItem.catigoryItemList
+              ),
+            };
+            updatedItemList[existingCatigoryIndex] = updatedItem;
+          } else {
+            updatedItem = updatedCartigoryItem;
+            updatedItemList.push(updatedItem);
+          }
+        }
+      }
     }
+    const updatedTotalAmount = state.totalAmount - currentItemPrice;
     return {
       ...state,
-      itemList: updateItemList,
+      itemList: updatedItemList,
       totalAmount: updatedTotalAmount,
     };
   }
@@ -73,7 +154,6 @@ const cartReducer = (state, action) => {
   if (action.type === "UPDATE_FINAL_LIST") {
     return { ...state, finalItemList: action.finalItemList };
   }
-
   return defaultCartState;
 };
 
@@ -94,8 +174,8 @@ const CartContextProvider = (props) => {
     dispatchCartState({ type: "ADD_ITEM", item: item });
   };
 
-  const removeItemFormContext = (id) => {
-    dispatchCartState({ type: "REMOVE_ITEM", id: id });
+  const removeItemFormContext = (itemId) => {
+    dispatchCartState({ type: "REMOVE_ITEM", itemId: itemId });
   };
 
   const cartContext = {

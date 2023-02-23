@@ -1,12 +1,13 @@
 .available-list ul {
     list-style: none;
-    margin: 0;
+    margin: 20px;
     padding: 0;
+  
   }
 
   .available-list-item {
     display: flex;
-    justify-content: space-evenly;
+    justify-content: space-between;
     margin: 1rem;
     padding-bottom: 1rem;
     border-bottom: 1px solid #ccc;
@@ -14,6 +15,7 @@
   
   .available-list-item h3 {
     margin: 0 0 0.25rem 0;
+    width: max-content;
   }
   
   .description {

@@ -8,6 +8,14 @@
     z-index: 4;
 }
 
+.addItemWrapper{
+  padding: 0%;
+  width:40%;
+  /* height: 32rem; */
+ margin-left: 18rem;
+ margin-bottom: 2rem;
+}
+
 @keyframes tab-appear {
   from {
     opacity: 0;
@@ -18,4 +26,12 @@
     opacity: 1;
     transform: translateY(0);
   }
+}
+section {
+  width: 90%;
+  max-width: 40rem;
+  text-align: center;
+  background-color: white;
+  padding: 2rem;
+  border-radius: 12px;
 }

@@ -1,4 +1,5 @@
 import { useRef, useState } from "react";
+import Button from "../../UI/Button";
 import Input from "../../UI/Input";
 import styles from "./GrossaryItemForm.module.css";
 
@@ -34,7 +35,7 @@ function GrossaryItemForm(props) {
           defaultValue: "1",
         }}
       />
-      <button>+ Add</button>
+      <Button>+ Add</Button>
       {!amountIsValid && <p>Please enter a valid amount (1-5)</p>}
     </form>
   );

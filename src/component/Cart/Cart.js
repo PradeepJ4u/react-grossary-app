@@ -1,7 +1,6 @@
 import Modal from "../UI/Modal";
 import styles from "./Cart.module.css";
-import { useContext, useState } from "react";
-import CartContext from "../context/CartContext";
+import { useState } from "react";
 import CartItem from "./CartItem";
 import {
   Document,
@@ -12,6 +11,8 @@ import {
   View,
 } from "@react-pdf/renderer";
 import { getSystemDate } from "../Util/UtilityMethod";
+import { useDispatch, useSelector } from "react-redux";
+import { cartActions } from "../../store/cartSlice";
 
 const docStyles = StyleSheet.create({
   page: {
@@ -40,7 +41,7 @@ const docStyles = StyleSheet.create({
   },
   section: {
     paddingBottom: 10,
-    borderBottom: "1px solid #8a2b06",  
+    borderBottom: "1px solid #8a2b06",
   },
   text: {
     // margin: 18,
@@ -61,31 +62,36 @@ const docStyles = StyleSheet.create({
   },
 });
 function Cart(props) {
-  const cntx = useContext(CartContext);
-  const totalAmount = cntx.totalAmount.toFixed(2);
-  const showOrderButton = cntx.itemList.length > 0;
+  const totalAmount = useSelector((state) => state.cart.totalPrice);
+  const itemList = useSelector((state) => state.cart.itemList);
+  const showOrderButton = itemList.length > 0;
+  const dispatch = useDispatch();
   const [isOrderConfirmed, setIsOrderConfirmed] = useState(false);
+  const displayDate = getSystemDate();
 
   const addItemToCart = (item, itemCatigory) => {
     const formatedItem = {
-      catigory: itemCatigory,
-      catigoryItemData: {
-        itemId: item.itemId,
-        itemName: item.itemName,
-        defaultQuantity: item.defaultQuantity,
-        defaultUnitQuantity: item.defaultUnitQuantity,
-        price: item.price,
-        amount: +1,
+      item: {
+        catigory: itemCatigory,
+        catigoryItemData: {
+          itemId: item.itemId,
+          itemName: item.itemName,
+          defaultQuantity: item.defaultQuantity,
+          defaultUnitQuantity: item.defaultUnitQuantity,
+          price: +item.price,
+          amount: +1,
+        },
       },
     };
-    cntx.addItem(formatedItem);
+    dispatch(cartActions.addItemToCart(formatedItem));
   };
+  console.log(itemList);
   const removeItemToCart = (itemId) => {
-    cntx.removeItem(itemId);
+    dispatch(cartActions.removeItemFromCart(itemId));
   };
   const cartItem = (
     <ul className={styles["catigory-items"]}>
-      {cntx.itemList.map((catigoryListItem) => {
+      {itemList.map((catigoryListItem) => {
         return (
           <div
             className={styles["catigory-item"]}
@@ -111,11 +117,10 @@ function Cart(props) {
       })}
     </ul>
   );
-  console.log(cntx.itemList);
-  const displayDate = getSystemDate();
+  console.log(itemList);
   let itemCount = 0;
-  for (let i = 0; i < cntx.itemList.length; i++) {
-    itemCount = itemCount + cntx.itemList[i].catigoryItemList.length;
+  for (let i = 0; i < itemList.length; i++) {
+    itemCount = itemCount + itemList[i].catigoryItemList.length;
   }
   console.log(itemCount);
   const pdfDoc = (
@@ -125,7 +130,7 @@ function Cart(props) {
           <Text style={docStyles.date}>Date: {displayDate}</Text>
           <Text style={docStyles.itemNumber}> No. of Items: {itemCount} </Text>
         </View>
-        {cntx.itemList.map((catigoryListItem) => {
+        {itemList.map((catigoryListItem) => {
           return (
             <View style={docStyles.section} key={catigoryListItem.catigory}>
               <Text style={docStyles.catigory}>
@@ -160,6 +165,7 @@ function Cart(props) {
   };
 
   const [instance, updateInstance] = usePDF({ document: pdfDoc });
+  if (false) updateInstance(null);
   if (isOrderConfirmed) {
     if (instance.loading) return <div>Loading ...</div>;
 

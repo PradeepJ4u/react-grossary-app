@@ -1,26 +1,27 @@
-import { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import Cart from "./component/Cart/Cart";
-import CartContextProvider from "./component/context/CartContextProvider";
 import GrossaryTab from "./component/Grossary/GrossaryTab";
 import Header from "./component/Header/Header";
+import { uiAction } from "./store/ui";
 
 function App() {
-  const [showCart, setShowCart] = useState(false);
+  const dispatch = useDispatch()
+  const showCart = useSelector(state => state.ui.showCart)
 
   const hideCart = () => {
-    setShowCart(false);
+    dispatch(uiAction.hideCart())
   };
 
   const handelCartClick = () => {
-    setShowCart(true);
+    dispatch(uiAction.showCart())
   };
 
   return (
-    <CartContextProvider>
+    <>
       {showCart && <Cart hideCart={hideCart} />}
       <Header cartClick={handelCartClick} />
       <GrossaryTab />
-    </CartContextProvider>
+    </>
   );
 }
 

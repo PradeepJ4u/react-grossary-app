@@ -1,6 +1,7 @@
 import useDatabase from "../hooks/usedatabase";
 import useInput from "../hooks/useInput";
 import Button from "../UI/Button";
+import Card from "../UI/Card";
 import styles from "./AddNewItem.module.css";
 
 function AddNewItem(props) {
@@ -44,7 +45,7 @@ function AddNewItem(props) {
     ? styles.invalid
     : styles.control;
 
-     //Default Unit Quantity 
+  //Default Unit Quantity
   const {
     value: enteredDefaultUnitQuantity,
     hasError: enteredIsDefaultUnitQuantityValid,
@@ -52,13 +53,13 @@ function AddNewItem(props) {
     enteredValueHandller: inputDefaultUnitQuantityHandller,
     enteredValueBlurrHandller: inputDefaultUnitQuantityBlurrHandller,
   } = useInput((value) => {
-    return value.trim() === "" ;
+    return value.trim() === "";
   });
   const defaultDefaultUnitQuantityClass = enteredIsDefaultUnitQuantityValid
     ? styles.invalid
     : styles.control;
 
-     //Price
+  //Price
   const {
     value: enteredPrice,
     hasError: enteredIsPriceValid,
@@ -68,27 +69,33 @@ function AddNewItem(props) {
   } = useInput((value) => {
     return value.trim() === "" || value.trim() === 0;
   });
-  const priceClass = enteredIsPriceValid
-    ? styles.invalid
-    : styles.control;
+  const priceClass = enteredIsPriceValid ? styles.invalid : styles.control;
 
   let isFormInvalid = false;
   if (
-    !enteredItemNameIsValid &&
-    !enteredIsCatigoryValid &&
-    !enteredIsDefaultQuantityValid
+    enteredItemName.trim() !== "" &&
+    enteredCatigory.trim() !== "" &&
+    enteredDefaultUnitQuantity !== 0 &&
+    enteredDefaultUnitQuantity.trim() !== "" &&
+    enteredPrice !== 0
   ) {
     isFormInvalid = true;
   }
-  
   //saving data logic
-  const { isLoading, error, fetchTasks :setNewDataAdded } = useDatabase()
-let newDataAdded = null
+  const { isLoading, error, fetchTasks: setNewDataAdded } = useDatabase();
+  console.log(error);
+  let newDataAdded = null;
   async function submitHandler(event) {
     event.preventDefault();
-   
-    if (enteredItemNameIsValid) return;
+    inputItemBlurrHandller()
+    inputCatigoryBlurrHandller()
+    inputDefaultQuantityBlurrHandller()
+    inputDefaultUnitQuantityBlurrHandller()
+    inputPriceBlurrHandller()
 
+    if (!isFormInvalid) {
+      return;
+    }
     const enteredValue = {
       itemId: Math.floor(Date.now() + Math.random()),
       itemName: enteredItemName,
@@ -103,29 +110,31 @@ let newDataAdded = null
     const loadedTask = (data) => {
       console.log(data);
       console.log(enteredValue);
-      newDataAdded = data
-      props.onAddTask(enteredValue)
-    }
-    setNewDataAdded({
-      url: "https://grossary-app-28792-default-rtdb.asia-southeast1.firebasedatabase.app/BaseItems.json",
-      method: "POST",
-      body: enteredValue,
-      headers: {
-        "Content-Type": "application/json",
-      }
-    }, loadedTask)
+      newDataAdded = data;
+      props.onAddTask(enteredValue);
+    };
+    setNewDataAdded(
+      {
+        url: "https://grossary-app-28792-default-rtdb.asia-southeast1.firebasedatabase.app/BaseItems.json",
+        method: "POST",
+        body: enteredValue,
+        headers: {
+          "Content-Type": "application/json",
+        },
+      },
+      loadedTask
+    );
 
-      setNewDataAdded(true);
-      itemNameReset();
-      catigoryReset();
-      defaultQuantityReset();
-      defaultUnitQuantityReset();
-      priceReset();
-    
+    setNewDataAdded(true);
+    itemNameReset();
+    catigoryReset();
+    defaultQuantityReset();
+    defaultUnitQuantityReset();
+    priceReset();
   }
 
   return (
-    <>
+    <Card className={styles.addItemWrapper}>
       {isLoading && <p>Saving the data.</p>}
       {newDataAdded && <p>New Doc Added.</p>}
       {!isLoading && (
@@ -171,7 +180,9 @@ let newDataAdded = null
                 )}
               </div>
             </div>
-            <div className={`${styles.control} ${defaultDefaultUnitQuantityClass}`}>
+            <div
+              className={`${styles.control} ${defaultDefaultUnitQuantityClass}`}
+            >
               <label htmlFor="default-unit-quantity">
                 Default Unit Quantity.
               </label>
@@ -211,7 +222,7 @@ let newDataAdded = null
           </form>
         </section>
       )}
-    </>
+    </Card>
   );
 }
 export default AddNewItem;

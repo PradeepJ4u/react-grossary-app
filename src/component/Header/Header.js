@@ -1,14 +1,11 @@
 import styles from "./Header.module.css";
 import supermarkt from "../../assets/supermarkt.jpg";
 import HeaderCartButton from "./HeaderCartButton";
-import { useContext } from "react";
-import CartContext from "../context/CartContext";
+import { useSelector } from "react-redux";
 
 function Header(props) {
-  const cntx = useContext(CartContext);
-  console.log(cntx);
-  const user = cntx.user;
-  console.log(user);
+  const user = useSelector((state) => state.user.currentUser);
+  
   return (
     <>
       <header className={styles.header}>

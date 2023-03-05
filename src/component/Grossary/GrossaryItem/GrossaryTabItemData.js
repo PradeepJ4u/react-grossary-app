@@ -1,24 +1,29 @@
-import { useContext } from "react";
-import CartContext from "../../context/CartContext";
+import { useDispatch } from "react-redux";
+import { cartActions } from "../../../store/cartSlice";
 import GrossaryItemForm from "./GrossaryItemForm";
 import styles from "./GrossaryTabItemData.module.css";
+import { getSystemDate } from "../../Util/UtilityMethod";
 
 function GrossaryTabItemData(props) {
-  const cntx = useContext(CartContext);
+  const dispatch = useDispatch();
   const grossaryItem = props.item;
 
   const addToCartHandler = (enteredAmount) => {
-    cntx.addItem({
-      catigory: props.itemCatigory,
-      catigoryItemData: {
-        itemId: grossaryItem.itemId,
-        itemName: grossaryItem.itemName,
-        defaultQuantity: +grossaryItem.defaultQuantity,
-        defaultUnitQuantity: grossaryItem.defaultUnitQuantity,
-        price: grossaryItem.price,
-        amount: enteredAmount,
+    const newItem = {
+      item: {
+        catigory: props.itemCatigory,
+        catigoryItemData: {
+          itemId: grossaryItem.itemId,
+          itemName: grossaryItem.itemName,
+          defaultQuantity: +grossaryItem.defaultQuantity,
+          defaultUnitQuantity: grossaryItem.defaultUnitQuantity,
+          price: grossaryItem.price,
+          amount: enteredAmount,
+        },
       },
-    });
+    };
+    dispatch(cartActions.updateOrderDate(getSystemDate()))
+    dispatch(cartActions.addItemToCart(newItem));
   };
 
   return (

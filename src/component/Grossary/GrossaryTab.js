@@ -1,7 +1,3 @@
-import Tabs from "@mui/material/Tabs";
-import Box from "@mui/material/Box";
-import Card from "../UI/Card";
-import { Tab } from "@mui/material";
 import GrossaryTabItemList from "./GrossaryTabItemList";
 
 import styles from "./GrossaryTab.module.css";
@@ -10,29 +6,29 @@ import { formatLoadedList } from "../Util/UtilityMethod";
 import useDatabase from "../hooks/usedatabase";
 import { useEffect, useState } from "react";
 import AddNewItem from "../AddNewGrossaryItem/AddNewItem";
+import { useDispatch, useSelector } from "react-redux";
+import { uiAction } from "../../store/ui";
+import GrossaryItemTabHeader from "./GrossaryItemTabHeader";
+import { baseItemsAction } from "../../store/baseItemSlice";
 
 export default function GrossaryTab() {
   const { isLoading, error, fetchTasks } = useDatabase();
-  const [currentTab, setCurrentTab] = useState({ value: "", label: "" });
-  const [showAddForm, setShowAddForm] = useState(false);
-  const [baseGrossaryItem, setBaseGrossaryItem] = useState([]);
   const [isRefreshRequired, setIsRefreshRequired] = useState(false);
-
-  let currentTabValues = null;
+  const dispatch = useDispatch();
+  const showAddForm = useSelector((state) => state.ui.showAddItem);
+  const currentTabValue = useSelector((state) => state.currentTab.value);
+  const baseGrossaryItem = useSelector((state) => state.baseItem.baseItems);
 
   const handleShowAddFormButton = () => {
-    setShowAddForm(!showAddForm);
-  };
-
-  const handleChange = (event: React.SyntheticEvent, number) => {
-    currentTabValues = { value: number, label: baseGrossaryItem[number] };
-    setCurrentTab(currentTabValues);
+    dispatch(uiAction.toggleAddItem());
   };
 
   useEffect(() => {
+    let itemCount = 0
     const applyData = (data) => {
       const loadedData = [];
       for (const key in data) {
+        itemCount++
         loadedData.push({
           itemId: data[key].itemId,
           itemName: data[key].itemName,
@@ -45,7 +41,7 @@ export default function GrossaryTab() {
         });
       }
       const formattedItemList = formatLoadedList(loadedData);
-      setBaseGrossaryItem(formattedItemList);
+      dispatch(baseItemsAction.replaceBaseItems({baseItems:formattedItemList, totalItems: itemCount}))
     };
     fetchTasks(
       {
@@ -53,8 +49,8 @@ export default function GrossaryTab() {
       },
       applyData
     );
-    setIsRefreshRequired(false)
-  }, [fetchTasks, isRefreshRequired]);
+    setIsRefreshRequired(false);
+  }, [fetchTasks, isRefreshRequired, dispatch]);
   let content = "";
   if (error) {
     content = <button onClick={fetchTasks}>Try again</button>;
@@ -64,8 +60,8 @@ export default function GrossaryTab() {
     content = <p>"Loading tasks..."</p>;
   }
 
-  const taskAddHandler = (newItemAdded) => {
-    setIsRefreshRequired(true)
+  const taskAddHandler = () => {
+    setIsRefreshRequired(true);
   };
 
   return (
@@ -74,58 +70,32 @@ export default function GrossaryTab() {
         content
       ) : (
         <>
-          <Card className={styles.addItemWrapper}>
-            {showAddForm ? (
-              <AddNewItem
-                onHideForm={handleShowAddFormButton}
-                onAddTask={taskAddHandler}
+          {showAddForm ? (
+            <AddNewItem
+              onHideForm={handleShowAddFormButton}
+              onAddTask={taskAddHandler}
+            />
+          ) : (
+            <Button type="button" onClick={handleShowAddFormButton}>
+              Add New Item
+            </Button>
+          )}
+          {baseGrossaryItem.length === 0 ? (
+            <p>No Item in List.</p>
+          ) : (
+            <>
+              <GrossaryItemTabHeader baseItemList={baseGrossaryItem} />
+              <GrossaryTabItemList
+                value={currentTabValue === "" ? 0 : currentTabValue}
+                index={currentTabValue === "" ? 0 : currentTabValue}
+                selectedcatigorydata={
+                  baseGrossaryItem[currentTabValue] == null
+                    ? baseGrossaryItem[0]
+                    : baseGrossaryItem[currentTabValue]
+                }
               />
-            ) : (
-              <Button type="button" onClick={handleShowAddFormButton}>
-                Add New Item
-              </Button>
-            )}
-          </Card>
-          <Card>
-            {baseGrossaryItem.length === 0 ? (
-              <p>No Item in List.</p>
-            ) : (
-              <>
-                <Box
-                  sx={{
-                    // maxWidth: { xs: 320, sm: 480 },
-                    bgcolor: "background.paper",
-                  }}
-                >
-                  <Tabs
-                    value={+currentTab.value}
-                    onChange={handleChange}
-                    variant="scrollable"
-                    orientation="horizontal"
-                    aria-label="scrollable auto tabs example"
-                  >
-                    {baseGrossaryItem.map((catigoryList) => {
-                      return (
-                        <Tab
-                          key={catigoryList.catigory}
-                          label={catigoryList.catigory}
-                        />
-                      );
-                    })}
-                  </Tabs>
-                </Box>
-                <GrossaryTabItemList
-                  value={currentTab.value === "" ? 0 : currentTab.value}
-                  index={currentTab.value === "" ? 0 : currentTab.value}
-                  selectedcatigorydata={
-                    baseGrossaryItem[currentTab.value] == null
-                      ? baseGrossaryItem[0]
-                      : baseGrossaryItem[currentTab.value]
-                  }
-                />
-              </>
-            )}
-          </Card>
+            </>
+          )}
         </>
       )}
     </section>

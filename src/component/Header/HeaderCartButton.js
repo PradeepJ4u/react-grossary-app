@@ -1,19 +1,16 @@
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import CartIcon from "../Cart/CartIcon";
-import CartContext from "../context/CartContext";
 import styles from "./HeaderCartButton.module.css";
 
 function HeaderCartButton(props) {
-  const cntx = useContext(CartContext);
+  const itemList = useSelector(state => state.cart.itemList)
   const [bumpCartButtom, setBumpCartButton] = useState(false);
-
-  const itemListArray = cntx.itemList;
-
   let totalItemList = [];
 
-  for (let i = 0; i < itemListArray.length; i++) {
-    for (let j = 0; j < itemListArray[i].catigoryItemList.length; j++) {
-      totalItemList.push(itemListArray[i].catigoryItemList[j]);
+  for (let i = 0; i < itemList.length; i++) {
+    for (let j = 0; j < itemList[i].catigoryItemList.length; j++) {
+      totalItemList.push(itemList[i].catigoryItemList[j]);
     }
   }
   const numberOfCartItem = totalItemList.reduce((currNumber, item) => {
@@ -31,7 +28,7 @@ function HeaderCartButton(props) {
     return () => {
       clearTimeout(timer);
     };
-  }, [itemListArray]);
+  }, [itemList]);
 
   return (
     <button className={buttonClasses} onClick={props.cartClick}>

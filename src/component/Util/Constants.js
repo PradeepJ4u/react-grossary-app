@@ -4,6 +4,7 @@ const Users = [
     userFirstName: "Pradeep",
     userLastName: "Joshi",
     roles: ["admin", "user"],
+    isAdmin: true,
     previousOrders: [
       {
         billDate: "01/01/2023",
@@ -59,7 +60,68 @@ const Users = [
         ],
       },
     ],
-  },
+  },{
+    userId: 2,
+    userFirstName: "Monika",
+    userLastName: "Garg",
+    roles: ["user"],
+    isAdmin: false,
+    previousOrders: [
+      {
+        billDate: "01/01/2023",
+        billAmount: "Rs. 254.00",
+        listItems: [{ item: {}, orderedQuantity: 2 }],
+      },
+    ],
+    customItems: [
+      {
+        catigory: "Snacks",
+        catigoryItemList: [
+          {
+            itemId: 101,
+            itemName: "Nice Time",
+            img: "",
+            isBaseItem: false,
+            defaultQuantity: 1,
+            defaultUnitQuantity: "pc",
+            price: 150.0,
+          },
+          {
+            itemId: 102,
+            itemName: "Britania Rusk",
+            img: "",
+            isBaseItem: false,
+            defaultQuantity: 1,
+            defaultUnitQuantity: "pc",
+            price: 150.0,
+          },
+        ],
+      },
+      {
+        catigory: "Grains",
+        catigoryItemList: [
+          {
+            itemId: 103,
+            itemName: "Mong Daal",
+            img: "",
+            isBaseItem: true,
+            defaultQuantity: 500,
+            defaultUnitQuantity: "grms",
+            price: 90.0,
+          },
+          {
+            itemId: 104,
+            itemName: "Mix Daal",
+            img: "",
+            isBaseItem: true,
+            defaultQuantity: 500,
+            defaultUnitQuantity: "grms",
+            price: 100,
+          },
+        ],
+      },
+    ],
+  }
 ];
 
 const BaseItemList = [

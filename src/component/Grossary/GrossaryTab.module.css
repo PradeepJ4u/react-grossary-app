@@ -8,14 +8,6 @@
     z-index: 4;
 }
 
-.addItemWrapper{
-  padding: 0%;
-  width:40%;
-  /* height: 32rem; */
- margin-left: 18rem;
- margin-bottom: 2rem;
-}
-
 @keyframes tab-appear {
   from {
     opacity: 0;

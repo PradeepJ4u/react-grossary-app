@@ -1,11 +1,9 @@
 .control {
   margin: 1rem 0;
-  display: flex;
 }
 
 .control label {
   display: block;
-  font-weight: bold;
   margin-bottom: 0.5rem;
   text-align: left;
   width: 200px;
@@ -24,6 +22,7 @@
     margin-top: 0px;
     font-size: small;
     font-weight: 200;
+    text-align: left;
   }
 
 .control input:focus {
@@ -34,13 +33,19 @@
 
 .control.invalid label {
   color: red;
+  font-style: small;
+}
+
+.control.invalid input:focus {
+  border-color: #ff8800;
+  background-color: #fbe8d2;
 }
 
 .control.invalid input {
   background: salmon;
   border-color: red;
 }
-/* .form button {
+.action button {
   font: inherit;
   cursor: pointer;
   background-color: #8a2b06;
@@ -52,8 +57,18 @@
   margin-right: 15px;
 }
 
-.form button:hover,
-.form button:active {
+.action button:hover,
+.action button:active {
   background-color: #641e03;
   border-color: #641e03;
-} */
+}
+
+.action button:disabled,
+.action button:disabled:hover,
+.action button:disabled:active{
+  background-color: #ccc;
+  color:#292929;
+  border-color: #ccc;
+  cursor: not-allowed;
+
+}

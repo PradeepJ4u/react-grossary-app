@@ -1,193 +1,213 @@
-import { useRef, useState } from "react";
+import useDatabase from "../hooks/usedatabase";
+import useInput from "../hooks/useInput";
 import Button from "../UI/Button";
 import styles from "./AddNewItem.module.css";
 
 function AddNewItem(props) {
-  const [isItemNameValid, setIsItemNameValid] = useState(true);
-  const [isCatigoryValid, setIsCatigoryValid] = useState(true);
-  const [isdefaultQuantityValid, setIsdefaultQuantityValid] = useState(true);
-  const [isDefaultUnitQuantityValid, setisDefaultUnitQuantityValid] =
-    useState(true);
-  const [isPriceValid, setIsPriceValid] = useState(true);
-  const [loading, setLoading] = useState(false);
-  const [newDataAdded, setNewDataAdded] = useState(false);
+  //itemNameClass
+  const {
+    value: enteredItemName,
+    hasError: enteredItemNameIsValid,
+    reset: itemNameReset,
+    enteredValueHandller: inputItemNameHandller,
+    enteredValueBlurrHandller: inputItemBlurrHandller,
+  } = useInput((value) => {
+    return value.trim() === "";
+  });
+  const itemNameClass = enteredItemNameIsValid
+    ? styles.invalid
+    : styles.control;
+  //enteredCatigory
+  const {
+    value: enteredCatigory,
+    hasError: enteredIsCatigoryValid,
+    reset: catigoryReset,
+    enteredValueHandller: inputCatigoryHandller,
+    enteredValueBlurrHandller: inputCatigoryBlurrHandller,
+  } = useInput((value) => {
+    return value.trim() === "";
+  });
+  const catigoryNameClass = enteredIsCatigoryValid
+    ? styles.invalid
+    : styles.control;
+  //Default Quantity
+  const {
+    value: enteredDefaultQuantity,
+    hasError: enteredIsDefaultQuantityValid,
+    reset: defaultQuantityReset,
+    enteredValueHandller: inputDefaultQuantityHandller,
+    enteredValueBlurrHandller: inputDefaultQuantityBlurrHandller,
+  } = useInput((value) => {
+    return value.trim() === "" || value.trim() === 0;
+  });
+  const defaultQuantityClass = enteredIsDefaultQuantityValid
+    ? styles.invalid
+    : styles.control;
 
-  const itemNameRef = useRef("");
-  const catigoryRef = useRef("");
-  const defaultQuantityRef = useRef(0);
-  const defaultUnitQuantityRef = useRef("");
-  const priceRef = useRef(0);
+     //Default Unit Quantity 
+  const {
+    value: enteredDefaultUnitQuantity,
+    hasError: enteredIsDefaultUnitQuantityValid,
+    reset: defaultUnitQuantityReset,
+    enteredValueHandller: inputDefaultUnitQuantityHandller,
+    enteredValueBlurrHandller: inputDefaultUnitQuantityBlurrHandller,
+  } = useInput((value) => {
+    return value.trim() === "" ;
+  });
+  const defaultDefaultUnitQuantityClass = enteredIsDefaultUnitQuantityValid
+    ? styles.invalid
+    : styles.control;
 
+     //Price
+  const {
+    value: enteredPrice,
+    hasError: enteredIsPriceValid,
+    reset: priceReset,
+    enteredValueHandller: inputPriceHandller,
+    enteredValueBlurrHandller: inputPriceBlurrHandller,
+  } = useInput((value) => {
+    return value.trim() === "" || value.trim() === 0;
+  });
+  const priceClass = enteredIsPriceValid
+    ? styles.invalid
+    : styles.control;
+
+  let isFormInvalid = false;
+  if (
+    !enteredItemNameIsValid &&
+    !enteredIsCatigoryValid &&
+    !enteredIsDefaultQuantityValid
+  ) {
+    isFormInvalid = true;
+  }
+  
+  //saving data logic
+  const { isLoading, error, fetchTasks :setNewDataAdded } = useDatabase()
+let newDataAdded = null
   async function submitHandler(event) {
     event.preventDefault();
-    if (itemNameRef.current.value.trim().length === 0)
-      setIsItemNameValid(false);
-    if (catigoryRef.current.value.trim().length === 0)
-      setIsCatigoryValid(false);
-    if (
-      defaultQuantityRef.current.value.trim().length === 0 ||
-      defaultQuantityRef.current.value === 0
-    )
-      setIsdefaultQuantityValid(false);
-    if (defaultUnitQuantityRef.current.value.trim().length === 0)
-      setisDefaultUnitQuantityValid(false);
-    if (
-      priceRef.current.value.trim().length === 0 ||
-      priceRef.current.value === 0
-    )
-      setIsPriceValid(false);
+   
+    if (enteredItemNameIsValid) return;
 
     const enteredValue = {
       itemId: Math.floor(Date.now() + Math.random()),
-      itemName: itemNameRef.current.value,
+      itemName: enteredItemName,
       img: "",
       isBaseItem: true,
-      catigory: catigoryRef.current.value,
-      defaultQuantity: +defaultQuantityRef.current.value,
-      defaultUnitQuantity: defaultUnitQuantityRef.current.value,
-      price: +priceRef.current.value,
+      catigory: enteredCatigory,
+      defaultQuantity: +enteredDefaultQuantity,
+      defaultUnitQuantity: enteredDefaultUnitQuantity,
+      price: +enteredPrice,
     };
     console.log(enteredValue);
-    setLoading(true);
-    try {
-      const response = await fetch(
-        "https://grossary-app-28792-default-rtdb.asia-southeast1.firebasedatabase.app/BaseItems.json",
-        {
-          method: "POST",
-          body: JSON.stringify(enteredValue),
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      const data = await response.json();
+    const loadedTask = (data) => {
       console.log(data);
+      console.log(enteredValue);
+      newDataAdded = data
+      props.onAddTask(enteredValue)
+    }
+    setNewDataAdded({
+      url: "https://grossary-app-28792-default-rtdb.asia-southeast1.firebasedatabase.app/BaseItems.json",
+      method: "POST",
+      body: enteredValue,
+      headers: {
+        "Content-Type": "application/json",
+      }
+    }, loadedTask)
+
       setNewDataAdded(true);
-      setLoading(false);
-      props.onRefresh();
-      itemNameRef.current.value = "";
-      catigoryRef.current.value = "";
-      defaultQuantityRef.current.value = 0;
-      defaultUnitQuantityRef.current.value = "";
-      priceRef.current.value = 0;
-    } catch (err) {
-      console.log(err);
-    }
+      itemNameReset();
+      catigoryReset();
+      defaultQuantityReset();
+      defaultUnitQuantityReset();
+      priceReset();
+    
   }
-
-  const onItemNameBlurHandler = () => {
-    setNewDataAdded(false);
-    if (itemNameRef.current.value === "") {
-      setIsItemNameValid(false);
-    } else {
-      setIsItemNameValid(true);
-    }
-  };
-
-  const onCatigoryBlurHandler = () => {
-    setNewDataAdded(false);
-    if (catigoryRef.current.value === "") {
-      setIsCatigoryValid(false);
-    } else {
-      setIsCatigoryValid(true);
-    }
-  };
-  const onDefaultQuantityBlurHandler = () => {
-    setNewDataAdded(false);
-    if (defaultQuantityRef.current.value === "") {
-      setIsdefaultQuantityValid(false);
-    } else {
-      setIsdefaultQuantityValid(true);
-    }
-  };
-  const onDefaultUnitQuantityBlurHandler = () => {
-    setNewDataAdded(false);
-    if (defaultUnitQuantityRef.current.value === "") {
-      setisDefaultUnitQuantityValid(false);
-    } else {
-      setisDefaultUnitQuantityValid(true);
-    }
-  };
-  const onPriceBlurHandler = () => {
-    setNewDataAdded(false);
-    if (priceRef.current.value === "") {
-      setIsPriceValid(false);
-    } else {
-      setIsPriceValid(true);
-    }
-  };
 
   return (
     <>
-      {loading && <p>Saving the data.</p>}
+      {isLoading && <p>Saving the data.</p>}
       {newDataAdded && <p>New Doc Added.</p>}
-      {!loading && (
+      {!isLoading && (
         <section className={styles.newItemForm}>
           <form className={styles.form} onSubmit={submitHandler}>
-            <div className={styles.control}>
+            <div className={`${styles.control} ${itemNameClass}`}>
               <label htmlFor="itemName">Item Name</label>
               <input
                 type="text"
                 id="item-name"
-                ref={itemNameRef}
-                onBlur={onItemNameBlurHandler}
+                value={enteredItemName}
+                onChange={inputItemNameHandller}
+                onBlur={inputItemBlurrHandller}
               />
-              <div>{!isItemNameValid && <p>Enter a valid Item Name.</p>}</div>
+              {enteredItemNameIsValid && <p>Enter a valid Item Name.</p>}
             </div>
-            <div className={styles.control}>
+            <div className={`${styles.control} ${catigoryNameClass}`}>
               <label htmlFor="catigory">Catigory</label>
               <input
                 type="text"
                 id="catigory"
-                ref={catigoryRef}
-                onBlur={onCatigoryBlurHandler}
+                value={enteredCatigory}
+                onChange={inputCatigoryHandller}
+                onBlur={inputCatigoryBlurrHandller}
               />
-              <div>{!isCatigoryValid && <p>Enter a valid Catigory.</p>}</div>
+              <div>
+                {enteredIsCatigoryValid && <p>Enter a valid Catigory.</p>}
+              </div>
             </div>
-            <div className={styles.control}>
+            <div className={`${styles.control} ${defaultQuantityClass}`}>
               <label htmlFor="default-quantity">Default Quantity</label>
               <input
                 type="number"
                 id="default-quantity"
-                ref={defaultQuantityRef}
+                value={enteredDefaultQuantity}
+                onChange={inputDefaultQuantityHandller}
+                onBlur={inputDefaultQuantityBlurrHandller}
                 min="1"
-                onBlur={onDefaultQuantityBlurHandler}
               ></input>
               <div>
-                {!isdefaultQuantityValid && <p>Enter a valid Quantity.</p>}
+                {enteredIsDefaultQuantityValid && (
+                  <p>Enter a valid Quantity.</p>
+                )}
               </div>
             </div>
-            <div className={styles.control}>
+            <div className={`${styles.control} ${defaultDefaultUnitQuantityClass}`}>
               <label htmlFor="default-unit-quantity">
                 Default Unit Quantity.
               </label>
               <input
                 type="text"
                 id="default-unit-quantity"
-                ref={defaultUnitQuantityRef}
-                onBlur={onDefaultUnitQuantityBlurHandler}
+                value={enteredDefaultUnitQuantity}
+                onChange={inputDefaultUnitQuantityHandller}
+                onBlur={inputDefaultUnitQuantityBlurrHandller}
               />
               <div>
-                {!isDefaultUnitQuantityValid && (
+                {enteredIsDefaultUnitQuantityValid && (
                   <p>Enter a valid Unit Quantity.</p>
                 )}
               </div>
             </div>
-            <div className={styles.control}>
+            <div className={`${styles.control} ${priceClass}`}>
               <label htmlFor="price">Price</label>
               <input
                 type="number"
                 id="price"
-                ref={priceRef}
+                value={enteredPrice}
+                onChange={inputPriceHandller}
+                onBlur={inputPriceBlurrHandller}
                 min="1"
-                onBlur={onPriceBlurHandler}
               />
-              <div>{!isPriceValid && <p>Enter a valid Price.</p>}</div>
+              <div>{enteredIsPriceValid && <p>Enter a valid Price.</p>}</div>
             </div>
-            <Button type="submit">Save</Button>
-            <Button type="button" onClick={props.onHideForm}>
-              Close
-            </Button>
+            <div className={`${styles.control} ${priceClass}`}>
+              <Button type="submit" disabled={!isFormInvalid}>
+                Save
+              </Button>
+              <Button type="button" onClick={props.onHideForm}>
+                Close
+              </Button>
+            </div>
           </form>
         </section>
       )}

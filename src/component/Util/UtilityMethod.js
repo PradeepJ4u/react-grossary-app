@@ -1,14 +1,11 @@
 export const formatLoadedList = (loadedData) => {
-  console.log();
   const cuttentLoadedList = loadedData;
   const formatList = [];
-  console.log(cuttentLoadedList.length);
   for (let i = 0; i < cuttentLoadedList.length; i++) {
     const existingFinalListItemIndex = formatList.findIndex(
       (item) => item.catigory === cuttentLoadedList[i].catigory
     );
     const existingfinalListItem = formatList[existingFinalListItemIndex];
-    console.log(existingfinalListItem);
     if (existingfinalListItem) {
       const formatElement = {
         catigory: existingfinalListItem.catigory,
@@ -41,9 +38,28 @@ export const formatLoadedList = (loadedData) => {
           },
         ],
       };
-      console.log(formatElement);
       formatList.push(formatElement);
     }
   }
   return formatList;
 };
+
+export const getSystemDate = () =>{
+  var today = new Date();
+  var dd = today.getDate();
+  
+  var mm = today.getMonth()+1; 
+  var yyyy = today.getFullYear();
+  if(dd<10) 
+  {
+      dd='0'+dd;
+  } 
+  
+  if(mm<10) 
+  {
+      mm='0'+mm;
+  } 
+  today = mm+'/'+dd+'/'+yyyy;
+  console.log(today);
+  return today
+}

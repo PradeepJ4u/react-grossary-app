@@ -13,8 +13,8 @@ function GrossaryTabItemData(props) {
       catigoryItemData: {
         itemId: grossaryItem.itemId,
         itemName: grossaryItem.itemName,
-        quantity:
-          grossaryItem.defaultQuantity + " " + grossaryItem.defaultUnitQuantity,
+        defaultQuantity: +grossaryItem.defaultQuantity,
+        defaultUnitQuantity: grossaryItem.defaultUnitQuantity,
         price: grossaryItem.price,
         amount: enteredAmount,
       },

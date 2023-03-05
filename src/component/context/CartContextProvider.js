@@ -1,14 +1,16 @@
 import { useReducer } from "react";
-import { FINAL_DATA_LIST } from "../Util/Constants";
+import { CNTX_USER, FINAL_DATA_LIST } from "../Util/Constants";
 import CartContext from "./CartContext";
 
 const defaultCartState = {
+  user: CNTX_USER,
   finalItemList: [],
   itemList: [],
   totalAmount: 0,
 };
 
 const cartReducer = (state, action) => {
+  console.log(action.item);
   //Add Item: updating reducer State:
   if (action.type === "ADD_ITEM") {
     //Add Item: updating total Price
@@ -83,7 +85,8 @@ const cartReducer = (state, action) => {
                 {
                   itemId: existingList[i].catigoryItemList[j].itemId,
                   itemName: existingList[i].catigoryItemList[j].itemName,
-                  quantity: existingList[i].catigoryItemList[j].quantity,
+                  defaultQuantity: existingList[i].catigoryItemList[j].defaultQuantity,
+                  defaultUnitQuantity: existingList[i].catigoryItemList[j].defaultUnitQuantity,
                   amount: existingList[i].catigoryItemList[j].amount - 1,
                   price: existingList[i].catigoryItemList[j].price,
                 },
@@ -115,7 +118,8 @@ const cartReducer = (state, action) => {
               {
                 itemId: existingList[i].catigoryItemList[j].itemId,
                 itemName: existingList[i].catigoryItemList[j].itemName,
-                quantity: existingList[i].catigoryItemList[j].quantity,
+                defaultQuantity: existingList[i].catigoryItemList[j].defaultQuantity,
+                defaultUnitQuantity:existingList[i].catigoryItemList[j].defaultUnitQuantity,
                 amount: existingList[i].catigoryItemList[j].amount,
                 price: existingList[i].catigoryItemList[j].price,
               },
@@ -179,6 +183,7 @@ const CartContextProvider = (props) => {
   };
 
   const cartContext = {
+    user: CNTX_USER,
     finalItemList: cartState.finalItemList,
     itemList: cartState.itemList,
     totalAmount: cartState.totalAmount,
